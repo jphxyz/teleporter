@@ -8,12 +8,12 @@ to consolidate many altcoins into one desired currency.
 ## Install
 
 ### \*NIX (Linux, OSX)
-download and extract https://github.com/jphxyz/teleporter/archive/master.zip
-Create and edit `config/teleporter.ini` (Use config/teleporter.ini.sample as starting point)
+* download and extract https://github.com/jphxyz/teleporter/archive/master.zip
+* Create and edit `config/teleporter.ini` (Use config/teleporter.ini.sample as starting point)
 
 ### Windows
-Get Python 2.x or 3.x (https://www.python.org/downloads/)
-Follow steps for UNIX
+* Get Python >= 2.7 (https://www.python.org/downloads/)
+* Follow steps for UNIX
 
 ## Usage
 In terminal

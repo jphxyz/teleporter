@@ -9,7 +9,7 @@ to consolidate many altcoins into one desired currency.
 
 ### \*NIX (Linux, OSX)
 * download and extract https://github.com/jphxyz/teleporter/archive/master.zip
-* Create and edit `config/teleporter.ini` (Use config/teleporter.ini.sample as starting point)
+* Create and edit `config/teleporter.ini` (Use `config/teleporter.ini.sample` as starting point)
 
 ### Windows
 * Get Python >= 2.7 (https://www.python.org/downloads/)

@@ -120,7 +120,7 @@ six.print_('Fetching Account Balances...', end=' ', flush=True)
 # Not documented, but querying GetBalance with no
 # currency argument apparently returns all currencies.
 balances = api.getBalance('')
-six.print_('OK.\n')
+six.print_('\033[92m'+'OK'+'\033[0m'+'\n')
 
 # Sort out only the tradeable coins
 istradeable = lambda bal: (bal['Status'] == 'OK') and (bal['Symbol'] != BuyCoin) and (bal['Available'] > 0)
@@ -145,7 +145,7 @@ if len(available.keys()) == 0:
 # Initialize Network object (Queries info on all coins, tradepairs, and markets)
 six.print_('Initializing Market Network...', end=' ', flush=True)
 net = markets.Network(api)
-six.print_('OK.\n')
+six.print_('\033[92m'+'OK'+'\033[0m'+'\n')
 
 
 # TODO: Split most of the rest into a few smaller functions
@@ -261,7 +261,7 @@ for sellcoin in available:
             time.sleep(1)
         else:
             api.submitTrade(pair.Id, trade_type, rate, trade_amount)
-        six.print_('OK.')
+        six.print_('\033[92m'+'OK'+'\033[0m')
 
         value_of_previous_transaction = amount_of_output_currency
 

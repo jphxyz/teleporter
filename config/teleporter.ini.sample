@@ -10,6 +10,10 @@ Donate_Percent = 0.1
 ; Makes the whole thing seem more matrix-ish
 Gaudy_Startup_Sequence = true
 
+; Define something here if you want stdout
+; also logged to a file
+Log_File = LOG_FILE_PATH
+
 [Trade_Settings]
 ; Exchange for this coin.
 Coin_To_BUY = ETH

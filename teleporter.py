@@ -20,9 +20,25 @@
 '''
 
 import json, os, sys, time
+from datetime import datetime
 from Module import six
 from Module.CryptopiaWrapper import CryptopiaWrapper
 import Module.Markets as markets
+
+class Logger(object):
+    def __init__(self, logfilename='', logstamp=''):
+        self.pipes = [sys.stdout]
+        if logfilename != '':
+            self.pipes.append(open(logfilename, 'a'))
+            self.pipes[-1].write(logstamp)
+
+    def write(self, message):
+        for pipe in self.pipes:
+            pipe.write(message)
+
+    def flush(self):
+        for pipe in self.pipes:
+            pipe.flush()
 
 def pause(pause_seconds):
     ERASE_LINE = '\x1b[2K'
@@ -44,9 +60,10 @@ config = six.moves.configparser.ConfigParser()
 config.read(cfgloc)
 ConfDict        = config.__dict__['_sections']
 
-DryRun        = (ConfDict['Main_Settings']['dry_run'].lower() in ('y', 'yes', '1', 'true'))
+DryRun          = (ConfDict['Main_Settings']['dry_run'].lower() in ('y', 'yes', '1', 'true'))
 GaudyStartup    = (ConfDict['Main_Settings']['gaudy_startup_sequence'].lower() in ('y', 'yes', '1', 'true'))
 DonatePercent   = float(ConfDict['Main_Settings']['donate_percent'])/100.0
+LogFile         = ConfDict['Main_Settings']['log_file']
 
 BuyCoin         = ConfDict['Trade_Settings']['coin_to_buy']
 SellFraction    = float(ConfDict['Trade_Settings']['sell_percent_of_available_balance'])/100.0
@@ -92,6 +109,8 @@ time.sleep(zzz)
 six.print_('{:>76}'.format('by jphxyz'))
 six.print_(' ---------------------------------------------------------------------------\n')
 time.sleep(zzz)
+
+sys.stdout = Logger(LogFile, '\n'+'-'*10+'\n'+datetime.now().isoformat()+'\n\n')
 
 def istradeable(bal):
     result  = (bal['Status'] == 'OK')

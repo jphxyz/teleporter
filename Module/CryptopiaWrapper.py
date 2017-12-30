@@ -4,7 +4,7 @@ import base64, hashlib, hmac, json, time
 from . import six
 
 public_set = set([ "GetCurrencies", "GetTradePairs", "GetMarkets", "GetMarket", "GetMarketHistory", "GetMarketOrders" ])
-private_set = set([ "GetBalance", "GetDepositAddress", "GetOpenOrders", "GetTradeHistory", "GetTransactions", "SubmitTrade", "CancelTrade", "SubmitTip" ])
+private_set = set([ "GetBalance", "GetDepositAddress", "GetOpenOrders", "GetTradeHistory", "GetTransactions", "SubmitTrade", "CancelTrade", "SubmitTip", "SubmitWithdraw"])
 NonceTimeFactor = 3
 
 def NonceValue(NonceTimeFactor):
@@ -105,3 +105,9 @@ class CryptopiaWrapper:
 
     def submitTransfer(self, currency, user, amount):
         return self.query("SubmitTransfer", {'Currency':currency, 'Username':user, 'Amount':amount})
+
+    def submitWithdraw(self, currency, address, amount, paymentId=None):
+        args = {'Currency': currency, 'Address': address, 'PaymentId': paymentId, 'Amount': amount}
+        if paymentId:
+            args['PaymentId'] = paymentId
+        return self.query('SubmitWithdraw', args)

@@ -75,6 +75,12 @@ StopBalances    = {k.upper(): float(v) for k, v in six.iteritems(ConfDict['Keep_
 PublicKey       = ConfDict['Cryptopia']['public_key']
 PrivateKey      = ConfDict['Cryptopia']['private_key']
 
+AutoWithdraw      = (ConfDict['Withdraw']['auto_withdraw'].lower() in ('y', 'yes', '1', 'true'))
+WithdrawCoin      = ConfDict['Withdraw']['withdraw_currency']
+WithdrawAddress   = ConfDict['Withdraw']['withdraw_address']
+WithdrawFraction  = float(ConfDict['Withdraw']['withdraw_percent'])/100.0
+WithdrawThreshold = ConfDict['Withdraw']['withdraw_threshold']
+
 if '-n' in sys.argv or '--dry-run' in sys.argv:
     DryRun = True
 if '-c' in sys.argv:
@@ -116,11 +122,7 @@ def istradeable(bal):
     result  = (bal['Status'] == 'OK')
     result &= (bal['Symbol'] != BuyCoin)
     result &= (bal['Available'] > 0)
-    # TODO: Also check that there is a market on which the available quantity is above the 
-    # minimum trade.
-    #result &= (b['Available'] > net.getCurrency(bal['Symbol'])['MinBaseTrade'])
     return result
-
 
 six.print_('Fetching Account Balances...', end=' ', flush=True)
 # Not documented, but querying GetBalance with no
@@ -128,7 +130,7 @@ six.print_('Fetching Account Balances...', end=' ', flush=True)
 balances = api.getBalance('')
 
 available = {b['Symbol']:b['Available'] for b in balances if istradeable(b)}
-starting_buycoin_balance = api.getBalance(BuyCoin)[0]['Available']
+initial_buycoin_balance = api.getBalance(BuyCoin)[0]['Available']
 
 six.print_('OK.\n')
 
@@ -139,8 +141,7 @@ if len(available.keys()) == 0:
 rowfmt_s = '{:<10} {:>20} {:>20} {:>20}'
 six.print_(rowfmt_s.format('Commodity', 'Balance', 'StopBalance', 'SellAmount'))
 six.print_(rowfmt_s.format('-'*5, '-'*16, '-'*16, '-'*16))
-six.print_('\033[1m' + rowfmt_s.format(BuyCoin, '%0.8f'%starting_buycoin_balance, '', '') + '\033[0m')
-
+six.print_('\033[1m' + rowfmt_s.format(BuyCoin, '%0.8f'%initial_buycoin_balance, '', '') + '\033[0m')
 rowfmt_d = '{:<10} {:>20.8f} {:>20.8f} {:>20.8f}'
 for sym, bal in six.iteritems(available):
     stopbal = StopBalances[sym] if sym in StopBalances else 0.0
@@ -151,11 +152,9 @@ six.print_('Initializing Market Network...', end=' ', flush=True)
 net = markets.Network(api)
 six.print_('OK.\n')
 
-totalconverted = 0.0
+total_converted = 0.0
 
 # TODO: Split most of the rest into a few smaller functions
-
-completed_routes = 0
 
 for sellcoin in available:
     if available[sellcoin] == 0:
@@ -169,8 +168,6 @@ for sellcoin in available:
     expected_value, route = net.getBestRoute(sellcoin, BuyCoin, tosell, MaxTrades, RateOvershoot)
     if len(route) <= 1:
         continue
-    else:
-        completed_routes += 1
 
     rtstring = ' -> '.join(['[%s (%g)]'%(coin, qty) for coin, qty in route])
     six.print_('Established trade route: %s'%rtstring)
@@ -239,16 +236,33 @@ for sellcoin in available:
 
         six.print_('OK.')
 
-    totalconverted += resulting_value_of_previous_transaction
+    total_converted += resulting_value_of_previous_transaction
     six.print_('')
 
-if completed_routes == 0:
+if total_converted == 0:
     six.print_('No routes found.')
     sys.exit(0)
 
 if not DryRun:
+    # Submit optional donation
     six.print_('Donating %g%% to developers.'%(DonatePercent))
-    amtToDonate = totalconverted * DonatePercent
+    amtToDonate = total_converted * DonatePercent
     if amtToDonate > 0:
         api.submitTransfer(BuyCoin, 'jphxyz', amtToDonate)
         six.print_(' Thank you!!')
+
+    # Do auto-withdraw
+    if AutoWithdraw:
+        bal = api.getBalance(WithdrawCoin)[0]
+        while bal['HeldForTrades'] > 0:
+            six.print_('Waiting on open orders...')
+            pause(15)
+            bal = api.getBalance(WithdrawCoin)[0]
+
+        stopBal = StopBalances[WithdrawCoin] if WithdrawCoin in StopBalances else 0.0
+        amtToWithdraw = bal['Available'] * WithdrawFraction - stopBal
+
+        if bal['Available'] > WithdrawThreshold:
+            six.print_('\nWithdrawing %g %s to %s'%(amtToWithdraw, WithdrawCoin, WithdrawAddress))
+            api.submitWithdraw(WithdrawCoin, WithdrawAddress, amtToWithdraw)
+

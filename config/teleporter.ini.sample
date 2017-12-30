@@ -38,7 +38,21 @@ Sell_Percent_Of_Available_Balance = 100
 [Cryptopia]
 Public_Key  = YOUR_PUBLIC_KEY_HERE
 Private_Key = YOUR_PRIVATE_KEY_HERE
- 
+
+[Withdraw]
+; Auto withdraw will withdraw coins to an external wallet. The API
+; must first be configured to allow this, and the address should be
+; in your Cryptopia AddressBook.
+;
+; Auto withdraw will respect stop balances set in the [Keep_Balance]
+; section below. It can also be configured to withdraw only if the
+; available balance is above a designated threshold.
+Auto_Withdraw = true
+Withdraw_Currency  = COIN_SYMBOL
+Withdraw_Address   = <YOUR_WALLET_ADDRESS>
+Withdraw_Percent   = 100
+Withdraw_Threshold = 0.1
+
 [Keep_Balance]
 ; If you'd like to keep a balance of any coin, list it here
 ; in a 'COIN = BALANCE' pair.

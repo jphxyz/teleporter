@@ -160,7 +160,7 @@ for sellcoin in available:
     # Establish route
     final_value, route_info = net.getBestRoute(sellcoin, BuyCoin, tosell, MaxTrades, RateOvershoot)
 
-    if len(route) <= 1:
+    if len(route_info) <= 1:
         # If no routes were found (happens when balances are
         # lower than minimum trades), then move on to next
         # tradeable coin.

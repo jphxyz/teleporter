@@ -93,12 +93,6 @@ six.print_('{:>76}'.format('by jphxyz'))
 six.print_(' ---------------------------------------------------------------------------\n')
 time.sleep(zzz)
 
-six.print_('Fetching Account Balances...', end=' ', flush=True)
-# Not documented, but querying GetBalance with no
-# currency argument apparently returns all currencies.
-balances = api.getBalance('')
-six.print_('OK.\n')
-
 def istradeable(bal):
     result  = (bal['Status'] == 'OK')
     result &= (bal['Symbol'] != BuyCoin)
@@ -108,18 +102,26 @@ def istradeable(bal):
     #result &= (b['Available'] > net.getCurrency(bal['Symbol'])['MinBaseTrade'])
     return result
 
+
+six.print_('Fetching Account Balances...', end=' ', flush=True)
+# Not documented, but querying GetBalance with no
+# currency argument apparently returns all currencies.
+balances = api.getBalance('')
+
 available = {b['Symbol']:b['Available'] for b in balances if istradeable(b)}
+starting_buycoin_balance = api.getBalance(BuyCoin)[0]['Available']
+
+six.print_('OK.\n')
 
 if len(available.keys()) == 0:
     six.print_('No coins to sell. Exiting.')
     sys.exit(0)
 
-six.print_(' ---------------')
-six.print_('   Buy : ', BuyCoin)
-six.print_(' ---------------\n')
 rowfmt_s = '{:<10} {:>20} {:>20} {:>20}'
 six.print_(rowfmt_s.format('Commodity', 'Balance', 'StopBalance', 'SellAmount'))
 six.print_(rowfmt_s.format('-'*5, '-'*16, '-'*16, '-'*16))
+six.print_('\033[1m' + rowfmt_s.format(BuyCoin, '%0.8f'%starting_buycoin_balance, '', '') + '\033[0m')
+
 rowfmt_d = '{:<10} {:>20.8f} {:>20.8f} {:>20.8f}'
 for sym, bal in six.iteritems(available):
     stopbal = StopBalances[sym] if sym in StopBalances else 0.0

@@ -16,9 +16,13 @@ Get Python 2.x or 3.x (https://www.python.org/downloads/)
 Follow steps for UNIX
 
 ## Usage
-In terminal
+Basic usage, executes based on parameters in config/teleporter.ini
 ```
-cd /.../directory where you extracted files/teleporter-master
-
+cd <UNZIPPED DIRECTORY>
 python ./teleporter.py
+```
+
+You can also override parameters with command line flags.
+```
+teleporter [-h|--help] [-n|--dry-run] [-c|--coin <COIN>] [-m|--max-trades <MAX_TRADES>]
 ```

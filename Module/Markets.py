@@ -72,8 +72,13 @@ class Commodity:
         max_val = 0.0
         best_route = []
         for neighbor, rate, fee, mintrade, volume in self.neighbors:
-            if neighbor.Symbol in route: continue
-            if quantity < mintrade: continue
+            beenthere = False
+            for sym, qty in route:
+                if neighbor.Symbol == sym:
+                    beenthere = True
+                    break
+            if beenthere: continue
+            if quantity * (1.0 - fee/100.0) < mintrade: continue
             if quantity > volume/20.0: continue
             Q = quantity * rate * (1.0-overshoot) * (1.0-fee/100.0)
             val, rt = neighbor.getRoute(Q, goal, route, maxdepth, overshoot)
@@ -124,7 +129,7 @@ class Network:
                 ask = MKT['AskPrice']
                 vol = MKT['Volume']
                 basevol = MKT['BaseVolume']
-                if ask > 0:
+                if ask > 0 and bid > 0:
                     sym.addneighbor(base, bid, pair.TradeFee, pair.MinimumBaseTrade/bid, vol)
                     base.addneighbor(sym, 1.0/ask, pair.TradeFee, pair.MinimumBaseTrade, basevol)
 

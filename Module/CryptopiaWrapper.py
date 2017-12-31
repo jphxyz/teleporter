@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import base64, hashlib, hmac, json, sys, time, traceback
+import base64, hashlib, hmac, json, ssl, sys, time, traceback
 from datetime import datetime
 from . import six
 
@@ -18,13 +18,14 @@ class CryptopiaWrapper:
         self._PublicKey = PublicKey
         self._PrivateKey = PrivateKey
         self.http_retries = retries
+        self.cxt = ssl.create_default_context(cafile='Module/ssl-chain.pem')
 
     def query(self, method, req = {}):
         time.sleep(1.0 / float(NonceTimeFactor) + 0.01)
         try:
             if method in public_set:
                 url = '/'.join(['https://www.cryptopia.co.nz/api', method] + list(req.keys()))
-                r = six.moves.urllib.request.urlopen(url).read()
+                r = six.moves.urllib.request.urlopen(url, context=self.cxt).read()
 
             elif method in private_set:
                 repeat = self.http_retries
@@ -39,7 +40,8 @@ class CryptopiaWrapper:
                     signature = six.b(self._PublicKey + "POST" + six.moves.urllib.parse.quote_plus( url ).lower() + nonce) + requestContentBase64String
                     hmacsignature = base64.b64encode(hmac.new(base64.b64decode(self._PrivateKey), signature, hashlib.sha256).digest())
                     header_value = "amx " + self._PublicKey + ":" + hmacsignature.decode('utf-8') +  ":" + nonce
-                    handler = six.moves.urllib.request.HTTPHandler()
+                    #handler = six.moves.urllib.request.HTTPHandler()
+                    handler = six.moves.urllib.request.HTTPSHandler(context=self.cxt)
                     opener  = six.moves.urllib.request.build_opener(handler)
                     request = six.moves.urllib.request.Request(url, data=post_data)
                     request.add_header('Authorization', header_value)

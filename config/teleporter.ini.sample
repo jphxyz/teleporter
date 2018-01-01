@@ -32,6 +32,19 @@ Rate_Overshoot = 0.5
 ; Units: %
 Sell_Percent_Of_Available_Balance = 100
 
+; Number of seconds to wait on an open trade before cancelling
+; and recomputing available routes.
+Open_Trade_Timeout = 120
+
+; Minimum scaled 24 hour volume on market for any considered trade
+; Value 1 means that 1 unit of the commodity I'm looking to trade
+; has been exchanged in the past 24 hours. i.e. I can expect my trade
+; to take around 1 day. Value 48 means my trade should take around
+; half an hour, and so on. This should be inversely proportional to
+; your Open_Trade_Timeout. The default value corresponds to the
+; desired trade quantity being exchanged roughly every 45 seconds.
+Volume_Threshold = 1920
+
 [Cryptopia]
 Public_Key  = YOUR_PUBLIC_KEY_HERE
 Private_Key = YOUR_PRIVATE_KEY_HERE

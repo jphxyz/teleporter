@@ -64,7 +64,7 @@ class Commodity:
     def clearneighbors(self):
         self.neighbors = []
 
-    def getRoute(self, quantity, goal, route=[], maxdepth=3, overshoot=0.0):
+    def getRoute(self, quantity, goal, route=[], maxdepth=3, overshoot=0.0, vol_threshold=20):
         ''' Recursively query neighbors until 'goal' coin is reached. '''
         route = route + [(self.Symbol, quantity)]
         if self.Symbol == goal: return (quantity, route)
@@ -79,9 +79,9 @@ class Commodity:
                     break
             if beenthere: continue
             if quantity * (1.0 - fee/100.0) < mintrade: continue
-            if quantity > volume/20.0: continue
+            if quantity > volume/vol_threshold: continue
             Q = quantity * rate * (1.0-overshoot) * (1.0-fee/100.0)
-            val, rt = neighbor.getRoute(Q, goal, route, maxdepth, overshoot)
+            val, rt = neighbor.getRoute(Q, goal, route, maxdepth, overshoot, vol_threshold)
             if val > max_val:
                 max_val = val
                 best_route = rt
@@ -145,11 +145,11 @@ class Network:
     def getMarket(self, Id):
         return self.markets[Id]
 
-    def getBestRoute(self, from_currency, to_currency, amount, maxTx, overshoot):
+    def getBestRoute(self, from_currency, to_currency, amount, maxTx, overshoot, vol_threshold):
         ''' Trades 'amount' of 'from_currency' for 'to_currency' with
             no more than 'maxTx' transactions. '''
         start = self.currencies[from_currency]
-        value, route = start.getRoute(amount, to_currency, maxdepth=maxTx, overshoot=overshoot)
+        value, route = start.getRoute(amount, to_currency, maxdepth=maxTx, overshoot=overshoot, vol_threshold=vol_threshold)
         # route is a list of (CURRENCY, QUANTITY) pairs
         return (value, route)
 

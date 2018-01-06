@@ -5,6 +5,8 @@ Inspired by code from Cryptopia forum user, 'CoinUser'. This script
 automatically finds and executes the most profitable trade route
 to consolidate many altcoins into one desired currency.
 
+![Screenshot](screenshot.png)
+
 ## Install
 
 ### \*NIX (Linux, OSX)

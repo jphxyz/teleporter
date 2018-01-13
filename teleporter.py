@@ -194,7 +194,7 @@ while len(to_trade) > 0:
     sellcoin, amt_to_sell = to_trade.pop()
     amt_to_sell *= SellFraction
     if sellcoin in StopBalances:
-        amt_to_sell -= StopBalance[sellcoin]
+        amt_to_sell -= StopBalances[sellcoin]
 
     # Establish route
     final_value, route_info = net.getBestRoute(sellcoin, BuyCoin, amt_to_sell, MaxTrades, RateOvershoot, VolumeThreshold)

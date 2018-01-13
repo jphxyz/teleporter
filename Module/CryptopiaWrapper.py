@@ -20,6 +20,8 @@ class CryptopiaWrapper:
         self.http_retries = retries
 
     def query(self, method, req = {}):
+        assert self._PublicKey  != 'YOUR_PUBLIC_KEY_HERE', 'Be sure to enter your public and private keys in the config/teleporter.ini file.'
+        assert self._PrivateKey != 'YOUR_PRIVATE_KEY_HERE', 'Be sure to enter your public and private keys in the config/teleporter.ini file.'
         time.sleep(1.0 / float(NonceTimeFactor) + 0.01)
         try:
             if method in public_set:

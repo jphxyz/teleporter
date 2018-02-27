@@ -82,6 +82,9 @@ WithdrawFraction  = float(ConfDict['Withdraw']['withdraw_percent'])/100.0
 WithdrawThreshold = ConfDict['Withdraw']['withdraw_threshold']
 
 # Check for CLI options (override config file options if so)
+if '-h' in sys.argv or '--help' in sys.argv:
+    six.print_('Usage: teleporter [-h|--help] [-n|--dry-run] [-c|--coin <COIN>] [-m|--max-trades <MAX_TRADES>]')
+    sys.exit()
 if '-n' in sys.argv or '--dry-run' in sys.argv:
     DryRun = True
 if '-c' in sys.argv:
@@ -92,8 +95,6 @@ if '-m' in sys.argv:
     MaxTrades = int(sys.argv[sys.argv.index('-m')+1])
 if '--max-trades' in sys.argv:
     MaxTrades = int(sys.argv[sys.argv.index('--max-trades')+1])
-if '-h' in sys.argv or '--help' in sys.argv:
-    six.print_('Usage: teleporter [-h|--help] [-n|--dry-run] [-c|--coin <COIN>] [-m|--max-trades <MAX_TRADES>]')
 
 api = CryptopiaWrapper(PublicKey, PrivateKey)
 
